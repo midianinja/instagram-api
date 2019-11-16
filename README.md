@@ -1,3 +1,3 @@
-# intagram-api
+# instagram-api
 
 loading...
