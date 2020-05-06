@@ -19,14 +19,22 @@ service: instagram-api # NOTE: update this with your service name
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  runtime: nodejs12.x
   region: us-west-2
   timeout: 40
-  
+
 custom:
   webpack:
+    keepOutputDirectory: true
     webpackConfig: ./webpack.config.js
     includeModules: true
+
+package:
+  exclude:
+    - node_modules/*
+    - '!node_modules/node-fetch/**'
+  include:
+    - .webpack
 
 # you can overwrite defaults here
 #  stage: dev
