@@ -1,4 +1,4 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-serverless';
 
 const headers = {
   'Access-Control-Allow-Credentials': true,
