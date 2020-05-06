@@ -22,8 +22,7 @@ phases:
       - echo removing dev dependences
       # - npm uninstall --only=dev
 
-      - echo making serverless deploy
-      - echo using environment $NODE_ENV
+      - echo making serverless deploy | $NODE_ENV
       - sls deploy --stage $NODE_ENV | tee deploy.out
   post_build:
     commands:

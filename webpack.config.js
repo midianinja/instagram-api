@@ -9,6 +9,11 @@ module.exports = {
   optimization: {
     minimize: true,
   },
+  plugins: [
+    new slsw.DefinePlugin({
+      AWS_ACCOUNT_ID: `${process.env.AWS_ACCOUNT_ID}`,
+    }),
+  ],
   performance: {
     hints: false,
   },
