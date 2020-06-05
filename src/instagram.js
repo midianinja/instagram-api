@@ -1,4 +1,5 @@
-import puppeteer from 'puppeteer-serverless';
+import chromium from 'chrome-aws-lambda';
+import puppeteer from 'puppeteer-core';
 
 const headers = {
   'Access-Control-Allow-Credentials': true,
@@ -11,13 +12,17 @@ const headers = {
  * @param  {object} event request params
  * @param  {object} event.pathParameters uri parameters
  * @param  {object} event.pathParameters.user it is the instagram user
- * @returns {object} containt status, success data with photos or error
+ * @returns {object} containt status, success and body data with photos or error
  */
 export const getPhotos = async (event) => {
   const { user } = event.pathParameters;
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath,
+    headless: chromium.headless,
+  });
   const page = await browser.newPage();
-
   await page.goto(`https://instagram.com/${user}/`);
   const imageLinks = await page.evaluate(() => {
     // eslint-disable-next-line no-undef
