@@ -1,5 +1,4 @@
-import chromium from 'chrome-aws-lambda';
-import puppeteer from 'puppeteer-core';
+import puppeteer from 'puppeteer-serverless';
 
 const headers = {
   'Access-Control-Allow-Credentials': true,
@@ -12,17 +11,13 @@ const headers = {
  * @param  {object} event request params
  * @param  {object} event.pathParameters uri parameters
  * @param  {object} event.pathParameters.user it is the instagram user
- * @returns {object} containt status, success and body data with photos or error
+ * @returns {object} containt status, success data with photos or error
  */
 export const getPhotos = async (event) => {
   const { user } = event.pathParameters;
-  const browser = await puppeteer.launch({
-    args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath,
-    headless: chromium.headless,
-  });
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
+
   await page.goto(`https://instagram.com/${user}/`);
   const imageLinks = await page.evaluate(() => {
     // eslint-disable-next-line no-undef
@@ -43,6 +38,34 @@ export const getPhotos = async (event) => {
     statusCode: 200,
     headers,
     body: JSON.stringify({ status: 'instagram-photos/success', data: imageLinks }),
+  });
+};
+
+export const getAvatar = async (event) => {
+  const { user } = event.pathParameters;
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+
+  await page.goto(`https://instagram.com/${user}/`);
+  const avatar = await page.evaluate(() => {
+    // eslint-disable-next-line no-undef
+    const elements = [...document.querySelector('main > div > header > div > div > img')];
+    return elements.map(element => element.src);
+  });
+
+  await browser.close();
+  if (!avatar) {
+    return ({
+      statusCode: 400,
+      headers,
+      body: JSON.stringify({ status: 'instagram-avatar/not-available-data' }),
+    });
+  }
+
+  return ({
+    statusCode: 200,
+    headers,
+    body: JSON.stringify({ status: 'instagram-avatar/success', avatar }),
   });
 };
 
